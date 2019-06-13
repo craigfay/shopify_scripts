@@ -1,9 +1,6 @@
 # Represents the logic of bundling shirts: 3 for $60, 2 for $45
-def tiered_shirt_bundles()
+class TieredShirtBundles
   def initialize()
-    # Items with this tag will have the discount applied
-    @tag = 'shirts'
-
     # The discount amount for a shirt that's included in a bundle of 3, and 2 respectively
     @discount_of_3 = Money.new(cents: 600)
     @discount_of_2 = Money.new(cents: 350)
@@ -13,7 +10,9 @@ def tiered_shirt_bundles()
   def run(cart)
     total_shirts = 0 # total shirts to discount
     applicable_items = cart.line_items.select do |line_item|
-      if line_item.variant.product.tags.include? @tag
+      is_shirt = line_item.variant.product.tags.include? 'shirts'
+      is_bundle = line_item.variant.product.tags.include? 'bundle'
+      if is_shirt and is_bundle
         total_shirts += line_item.quantity
         line_item
       end
