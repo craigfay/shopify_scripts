@@ -2,45 +2,47 @@
 class TieredShirtBundles
   def initialize()
     # The discount amount for a shirt that's included in a bundle of 3, and 2 respectively
-    @discount_of_3 = Money.new(cents: 600)
-    @discount_of_2 = Money.new(cents: 350)
+    @discount_per_item_in_bundle_of_three = Money.new(cents: 600)
+    @discount_per_item_in_bundle_of_two = Money.new(cents: 350)
   end
   
   # Apply the discount to a cart
   def run(cart)
-    total_shirts = 0
-    applicable_items = cart.line_items.select do |line_item|
+    # Each line_item has a quantity, which usually makes the total...
+    # ...quantity of items higher than the length of cart.line_items
+    total_item_count = 0
+    applicable_line_items = cart.line_items.select do |line_item|
       is_shirt = line_item.variant.product.tags.include? 'shirts'
       is_bundle = line_item.variant.product.tags.include? 'bundle'
       if is_shirt and is_bundle
-        total_shirts += line_item.quantity
+        total_item_count += line_item.quantity
         line_item
       end
     end
 
     # The remaining amount of items that can be discounted in each category
-    threes = (total_shirts / 3).floor * 3
-    twos = ((total_shirts % 3) / 2).floor * 2
+    items_in_bundles_of_3 = (total_item_count / 3).floor * 3
+    items_in_bundles_of_2 = ((total_item_count % 3) / 2).floor * 2
   
     # Change the price of applicable items
-    applicable_items.each do |item|
-      undiscounted = item.quantity
-      if threes >= undiscounted
-        new_price = undiscounted * @discount_of_3
-        item.change_line_price(item.line_price - new_price, message: "")
-        threes -= undiscounted
+    applicable_line_items.each do |line_item|
+      unexamined_item_count = line_item.quantity
+      if items_in_bundles_of_3 >= unexamined_item_count
+        discount = unexamined_item_count * @discount_per_item_in_bundle_of_three
+        line_item.change_line_price(line_item.line_price - discount, message: "")
+        items_in_bundles_of_3 -= unexamined_item_count
         next
       end
-      if threes > 0 and threes < undiscounted
-        new_price = threes * @discount_of_3
-        item.change_line_price(item.line_price - new_price, message: "")
-        undiscounted -= threes
-        threes = 0
+      if items_in_bundles_of_3 > 0 and items_in_bundles_of_3 < unexamined_item_count
+        discount = items_in_bundles_of_3 * @discount_per_item_in_bundle_of_three
+        line_item.change_line_price(line_item.line_price - discount, message: "")
+        unexamined_item_count -= items_in_bundles_of_3
+        items_in_bundles_of_3 = 0
       end
-      if twos >= undiscounted
-        new_price = undiscounted * @discount_of_2
-        item.change_line_price(item.line_price - new_price, message: "")
-        twos -= undiscounted
+      if items_in_bundles_of_2 >= unexamined_item_count
+        discount = unexamined_item_count * @discount_per_item_in_bundle_of_two
+        item.change_line_price(line_item.line_price - discount, message: "")
+        items_in_bundles_of_2 -= unexamined_item_count
       end
     end
   end
