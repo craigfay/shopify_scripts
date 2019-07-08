@@ -27,21 +27,22 @@ class TieredShirtBundles
       undiscounted = item.quantity
       if threes >= undiscounted
         new_price = undiscounted * @discount_of_3
-        item.change_line_price(new_price, message: "")
+        item.change_line_price(item.line_price - new_price, message: "")
+        puts new_price
         threes -= undiscounted
         next
       end
       if threes > 0 and threes < undiscounted
         new_price = threes * @discount_of_3
-        item.change_line_price(new_price, message: "")
+        item.change_line_price(item.line_price - new_price, message: "")
         undiscounted -= threes
         threes = 0
       end
       if twos >= undiscounted
         new_price = undiscounted * @discount_of_2
-        item.change_line_price(new_price, message: "")
+        item.change_line_price(item.line_price - new_price, message: "")
         twos -= undiscounted
-        next 
+        next
       end
     end
   end
