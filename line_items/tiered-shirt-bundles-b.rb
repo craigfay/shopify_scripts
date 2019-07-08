@@ -41,7 +41,6 @@ class TieredShirtBundles
         new_price = undiscounted * @discount_of_2
         item.change_line_price(item.line_price - new_price, message: "")
         twos -= undiscounted
-        next
       end
     end
   end
