@@ -28,7 +28,6 @@ class TieredShirtBundles
       if threes >= undiscounted
         new_price = undiscounted * @discount_of_3
         item.change_line_price(item.line_price - new_price, message: "")
-        puts new_price
         threes -= undiscounted
         next
       end
