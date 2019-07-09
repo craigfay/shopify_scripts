@@ -41,7 +41,7 @@ class TieredShirtBundles
       end
       if items_in_bundles_of_2 >= unexamined_item_count
         discount = unexamined_item_count * @discount_per_item_in_bundle_of_two
-        item.change_line_price(line_item.line_price - discount, message: "")
+        line_item.change_line_price(line_item.line_price - discount, message: "")
         items_in_bundles_of_2 -= unexamined_item_count
       end
     end
